@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mhina Family Group - Michango</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f5f5f5;margin:0;padding:15px;color:#222}
+.container{max-width:700px;margin:auto}
+h1{text-align:center;margin-bottom:4px}
+.sub{text-align:center;color:#666;margin-top:0}
+.card{background:#fff;padding:15px;margin:12px 0;border-radius:12px;box-shadow:0 2px 8px #0001}
+label{display:block;margin-top:9px;font-weight:bold}
+input,select,button{width:100%;padding:11px;margin-top:5px;box-sizing:border-box;border-radius:8px;border:1px solid #ccc;font-size:16px}
+button{background:#198754;color:white;border:0;font-weight:bold;cursor:pointer;margin-top:14px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:#f0f8f3;padding:14px;border-radius:10px;text-align:center}
+.stat b{display:block;font-size:21px}
+.item{border-bottom:1px solid #eee;padding:10px 0}
+.item:last-child{border-bottom:0}
+.pata{color:#198754;font-weight:bold}
+.small{font-size:13px;color:#777}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>MHINA FAMILY GROUP</h1>
+<p class="sub">Mfumo wa PATA ✓ wa michango ya familia</p>
+
+<div class="card">
+<div class="stats">
+<div class="stat"><span>Jumla ya pesa</span><b id="total">TSh 0</b></div>
+<div class="stat"><span>Idadi ya PATA</span><b id="count">0</b></div>
+</div>
+</div>
+
+<div class="card">
+<h3>Weka PATA ✓</h3>
+<label>Jina</label>
+<select id="name"></select>
+
+<label>Aina ya mchango</label>
+<select id="type">
+<option>Kila baada ya wiki - TSh 2,000</option>
+<option>Kila mwezi - TSh 20,000</option>
+<option>Harusi</option>
+<option>Maradhi</option>
+<option>Safari</option>
+<option>Mchango mwingine</option>
+</select>
+
+<label>Kiasi (TSh)</label>
+<input id="amount" type="number" value="2000" min="0">
+
+<label>Tarehe</label>
+<input id="date" type="date">
+
+<button onclick="addPayment()">PATA ✓ — Nimeshalipa</button>
+</div>
+
+<div class="card">
+<h3>Historia ya Michango</h3>
+<div id="list"><p class="small">Hakuna mchango bado.</p></div>
+</div>
+</div>
+
+<script>
+const members = [
+"Juma Mhina","Abdulkadir Mhina","Hamad Mhina","Abdulrahman Mhina","Lugundi Mhina",
+"Amina Juma","Maurid Juma","Abdul Hamad","Rahma Juma","Hawa Abdulrahman",
+"Ehedh Lugundi","Hawa Mwechiwa","Shashi Mngoya","Zahara Mhina","Asha Abdul","Fatuma Haji"
+];
+
+const nameEl=document.getElementById('name');
+members.forEach(n=>{let o=document.createElement('option');o.textContent=n;nameEl.appendChild(o)});
+document.getElementById('date').value=new Date().toISOString().slice(0,10);
+
+let payments=JSON.parse(localStorage.getItem('mhinaPayments')||'[]');
+
+function addPayment(){
+ const name=nameEl.value, type=document.getElementById('type').value;
+ const amount=Number(document.getElementById('amount').value||0);
+ const date=document.getElementById('date').value;
+ if(!amount || !date){alert("Weka kiasi na tarehe.");return}
+ payments.push({name,type,amount,date});
+ localStorage.setItem('mhinaPayments',JSON.stringify(payments));
+ render();
+}
+
+function render(){
+ let total=payments.reduce((s,p)=>s+p.amount,0);
+ document.getElementById('total').textContent="TSh "+total.toLocaleString();
+ document.getElementById('count').textContent=payments.length;
+ const list=document.getElementById('list');
+ if(!payments.length){list.innerHTML='<p class="small">Hakuna mchango bado.</p>';return}
+ list.innerHTML=payments.slice().reverse().map((p,i)=>`
+ <div class="item">
+ <div><b>${p.name}</b> <span class="pata">PATA ✓</span></div>
+ <div>TSh ${p.amount.toLocaleString()} — ${p.type}</div>
+ <div class="small">Tarehe: ${p.date}</div>
+ </div>`).join('');
+}
+render();
+</script>
+</body>
+</html>
