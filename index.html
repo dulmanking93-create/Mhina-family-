@@ -1,1 +1,448 @@
-index.html
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mhina Family Group - Michango</title>
+
+  <style>
+    body{
+      font-family:Arial,sans-serif;
+      background:#f5f5f5;
+      margin:0;
+      padding:15px;
+      color:#222;
+    }
+
+    .container{
+      max-width:700px;
+      margin:auto;
+    }
+
+    h1{
+      text-align:center;
+      margin-bottom:4px;
+    }
+
+    .sub{
+      text-align:center;
+      color:#666;
+      margin-top:0;
+    }
+
+    .card{
+      background:#fff;
+      padding:15px;
+      margin:12px 0;
+      border-radius:12px;
+      box-shadow:0 2px 8px #0001;
+    }
+
+    label{
+      display:block;
+      margin-top:9px;
+      font-weight:bold;
+    }
+
+    input,select,button{
+      width:100%;
+      padding:11px;
+      margin-top:5px;
+      box-sizing:border-box;
+      border-radius:8px;
+      border:1px solid #ccc;
+      font-size:16px;
+    }
+
+    button{
+      background:#198754;
+      color:white;
+      border:0;
+      font-weight:bold;
+      cursor:pointer;
+      margin-top:14px;
+    }
+
+    button:active{
+      opacity:.8;
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+
+    .stat{
+      background:#f0f8f3;
+      padding:14px;
+      border-radius:10px;
+      text-align:center;
+    }
+
+    .stat b{
+      display:block;
+      font-size:21px;
+      margin-top:5px;
+    }
+
+    .item{
+      border-bottom:1px solid #eee;
+      padding:10px 0;
+    }
+
+    .item:last-child{
+      border-bottom:0;
+    }
+
+    .pata{
+      color:#198754;
+      font-weight:bold;
+    }
+
+    .small{
+      font-size:13px;
+      color:#777;
+    }
+
+    .status{
+      text-align:center;
+      font-size:13px;
+      margin-top:8px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h1>MHINA FAMILY GROUP</h1>
+  <p class="sub">Mfumo wa PATA ✓ wa michango ya familia</p>
+
+  <div class="card">
+    <div class="stats">
+
+      <div class="stat">
+        <span>Jumla ya pesa</span>
+        <b id="total">TSh 0</b>
+      </div>
+
+      <div class="stat">
+        <span>Idadi ya PATA</span>
+        <b id="count">0</b>
+      </div>
+
+    </div>
+
+    <div id="status" class="status">Inaunganisha...</div>
+  </div>
+
+
+  <div class="card">
+
+    <h3>Weka PATA ✓</h3>
+
+    <label>Jina</label>
+    <select id="name"></select>
+
+    <label>Aina ya mchango</label>
+    <select id="type">
+
+      <option value="Wiki">Kila baada ya wiki - TSh 2,000</option>
+
+      <option value="Mwezi">Kila mwezi - TSh 20,000</option>
+
+      <option value="Harusi">Harusi</option>
+
+      <option value="Maradhi">Maradhi</option>
+
+      <option value="Safari">Safari</option>
+
+      <option value="Mwingine">Mchango mwingine</option>
+
+    </select>
+
+    <label>Kiasi (TSh)</label>
+    <input id="amount" type="number" value="2000" min="0">
+
+    <label>Tarehe</label>
+    <input id="date" type="date">
+
+    <button onclick="addPayment()">
+      PATA ✓ — Nimeshalipa
+    </button>
+
+  </div>
+
+
+  <div class="card">
+
+    <h3>Historia ya Michango</h3>
+
+    <div id="list">
+      <p class="small">Hakuna mchango bado.</p>
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+
+<script>
+
+const firebaseConfig = {
+
+  apiKey: "AIzaSyCOjRGqe5snC39ayzodcWvvbT8Xqg0juL8",
+
+  authDomain: "mhina-family-group.firebaseapp.com",
+
+  databaseURL: "https://mhina-family-group-default-rtdb.firebaseio.com",
+
+  projectId: "mhina-family-group",
+
+  storageBucket: "mhina-family-group.firebasestorage.app",
+
+  messagingSenderId: "559104066921",
+
+  appId: "1:559104066921:web:84a20aa826994cf34869f8",
+
+  measurementId: "G-L5G452S78W"
+
+};
+
+
+firebase.initializeApp(firebaseConfig);
+
+const db = firebase.database();
+
+const paymentsRef = db.ref("payments");
+
+
+const members = [
+
+  "Juma Mhina",
+  "Abdulkadir Mhina",
+  "Hamad Mhina",
+  "Abdulrahman Mhina",
+  "Lugundi Mhina",
+
+  "Amina Juma",
+  "Maurid Juma",
+  "Abdul Hamad",
+  "Rahma Juma",
+  "Hawa Abdulrahman",
+
+  "Ehedh Lugundi",
+  "Hawa Mwechiwa",
+  "Shashi Mngoya",
+  "Zahara Mhina",
+  "Asha Abdul",
+  "Fatuma Haji"
+
+];
+
+
+const nameEl = document.getElementById("name");
+
+members.forEach(function(name){
+
+  const option = document.createElement("option");
+
+  option.value = name;
+
+  option.textContent = name;
+
+  nameEl.appendChild(option);
+
+});
+
+
+document.getElementById("date").value =
+  new Date().toISOString().slice(0,10);
+
+
+function addPayment(){
+
+  const name =
+    document.getElementById("name").value;
+
+  const type =
+    document.getElementById("type").value;
+
+  const amount =
+    Number(document.getElementById("amount").value || 0);
+
+  const date =
+    document.getElementById("date").value;
+
+
+  if(!amount || !date){
+
+    alert("Weka kiasi na tarehe.");
+
+    return;
+
+  }
+
+
+  paymentsRef.push({
+
+    name: name,
+
+    type: type,
+
+    amount: amount,
+
+    date: date,
+
+    createdAt: Date.now()
+
+  })
+
+  .then(function(){
+
+    alert("PATA ✓ imehifadhiwa!");
+
+  })
+
+  .catch(function(error){
+
+    alert("Imeshindikana kuhifadhi: " + error.message);
+
+  });
+
+}
+
+
+paymentsRef.on("value", function(snapshot){
+
+  const data = snapshot.val() || {};
+
+  const payments = Object.values(data);
+
+
+  let total = 0;
+
+  payments.forEach(function(payment){
+
+    total += Number(payment.amount || 0);
+
+  });
+
+
+  document.getElementById("total").textContent =
+    "TSh " + total.toLocaleString();
+
+
+  document.getElementById("count").textContent =
+    payments.length;
+
+
+  const list = document.getElementById("list");
+
+
+  if(payments.length === 0){
+
+    list.innerHTML =
+      '<p class="small">Hakuna mchango bado.</p>';
+
+    return;
+
+  }
+
+
+  payments.sort(function(a,b){
+
+    return Number(b.createdAt || 0) -
+           Number(a.createdAt || 0);
+
+  });
+
+
+  list.innerHTML = "";
+
+
+  payments.forEach(function(payment){
+
+    const item = document.createElement("div");
+
+    item.className = "item";
+
+
+    const nameLine = document.createElement("div");
+
+    const nameBold = document.createElement("b");
+
+    nameBold.textContent = payment.name;
+
+    nameLine.appendChild(nameBold);
+
+
+    const pata = document.createElement("span");
+
+    pata.className = "pata";
+
+    pata.textContent = "  PATA ✓";
+
+    nameLine.appendChild(pata);
+
+
+    const amountLine = document.createElement("div");
+
+    amountLine.textContent =
+      "TSh " +
+      Number(payment.amount).toLocaleString() +
+      " — " +
+      payment.type;
+
+
+    const dateLine = document.createElement("div");
+
+    dateLine.className = "small";
+
+    dateLine.textContent =
+      "Tarehe: " + payment.date;
+
+
+    item.appendChild(nameLine);
+
+    item.appendChild(amountLine);
+
+    item.appendChild(dateLine);
+
+
+    list.appendChild(item);
+
+  });
+
+
+  document.getElementById("status").textContent =
+    "Imeunganishwa ✓";
+
+});
+
+
+paymentsRef.on("value", function(){
+
+  document.getElementById("status").textContent =
+    "Imeunganishwa ✓";
+
+}, function(error){
+
+  document.getElementById("status").textContent =
+    "Kuna tatizo la kuunganisha Firebase";
+
+  console.error(error);
+
+});
+
+</script>
+
+</body>
+</html>
