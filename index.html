@@ -409,15 +409,29 @@ paymentsRef.on("value", function(snapshot){
     dateLine.textContent =
       "Tarehe: " + payment.date;
 
+item.appendChild(nameLine);
+item.appendChild(amountLine);
+item.appendChild(dateLine);
 
-    item.appendChild(nameLine);
+const deleteBtn = document.createElement("button");
+deleteBtn.textContent = "🗑️ Futa";
+deleteBtn.style.background = "#dc3545";
+deleteBtn.style.marginTop = "8px";
 
-    item.appendChild(amountLine);
+deleteBtn.onclick = function(){
+  if(confirm("Una uhakika unataka kufuta mchango huu?")){
+    paymentsRef.child(payment.key).remove();
+  }
+};
 
-    item.appendChild(dateLine);
+item.appendChild(deleteBtn);
+list.appendChild(item);
+    
 
+    
 
-    list.appendChild(item);
+    
+
 
   });
 
