@@ -324,7 +324,12 @@ paymentsRef.on("value", function(snapshot){
 
   const data = snapshot.val() || {};
 
-  const payments = Object.values(data);
+  const payments = Object.entries(data).map(function(entry){
+  return {
+    key: entry[0],
+    ...entry[1]
+  };
+});
 
 
   let total = 0;
